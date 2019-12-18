@@ -117,7 +117,8 @@ function OpenXHtb(configs) {
        *  }}
        */
         var gdprConsent = ComplianceService.gdpr.getConsent();
-        var gdprPrivacyEnabled = ComplianceService.isPrivacyEnabled();
+        var uspConsent = ComplianceService.usp && ComplianceService.usp.getConsent();
+        var privacyEnabled = ComplianceService.isPrivacyEnabled();
 
         var tradeDeskId = null;
 
@@ -164,13 +165,17 @@ function OpenXHtb(configs) {
             queryObj.ttduuid = tradeDeskId;
         }
 
-        if (gdprPrivacyEnabled) {
+        if (privacyEnabled) {
             if (gdprConsent.consentString !== void(0)) { // eslint-disable-line
                 queryObj.gdpr_consent = gdprConsent.consentString; // eslint-disable-line
             }
 
             if (gdprConsent.applies !== void(0)) { // eslint-disable-line
                 queryObj.gdpr = gdprConsent.applies ? '1' : '0';
+            }
+
+            if (uspConsent) {
+                queryObj.us_privacy = uspConsent.uspString; // eslint-disable-line
             }
         }
 
@@ -386,7 +391,7 @@ function OpenXHtb(configs) {
             partnerId: 'OpenXHtb',
             namespace: 'OpenXHtb',
             statsId: 'OPNX',
-            version: '2.1.2',
+            version: '2.1.3',
             targetingType: 'slot',
             enabledAnalytics: {
                 requestTime: true
@@ -428,12 +433,12 @@ function OpenXHtb(configs) {
         configs.charset = configs.charset || 'UTF-8';
         configs.bidderCode = configs.bidderCode || 'hb_ix';
 
-        __baseAdRequestUrl = Network.buildUrl(Browser.getProtocol() + '//' + configs.host, [
+        __baseAdRequestUrl = Network.buildUrl('https://' + configs.host, [
             configs.medium,
             configs.version,
             configs.endPointName
         ]);
-        __baseBeaconUrl = Network.buildUrl(Browser.getProtocol() + '//' + configs.host, [
+        __baseBeaconUrl = Network.buildUrl('https://' + configs.host, [
             configs.medium,
             configs.version,
             'bo'
